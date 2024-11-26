@@ -53,7 +53,6 @@ public class UD03TareaEvaluativaEjercicio1 {
                 PreparedStatement stmt = conn.prepareStatement(eventsQuery);
                 ResultSet rs = stmt.executeQuery()
         ) {
-            
             // Control para informar si no hay datos
             boolean hasData = false;
             
@@ -97,7 +96,6 @@ public class UD03TareaEvaluativaEjercicio1 {
         // Imprime una línea con los datos del evento
         System.out.printf("%-32s %-12s %-36s %-30s%n",
                 eventName, "| " + asistentes, "| " + location[0], "| " + location[1]);
-        
     }
     
     /**
