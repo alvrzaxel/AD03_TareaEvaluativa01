@@ -18,12 +18,14 @@ public class UD03TareaEvaluativaEjercicio1 {
     public static void main(String[] args) {
         // Establece la conexión con la base de datos y ejecuta el flujo principal
         try(Connection conn = DriverManager.getConnection(CONNECTION_URL, USERNAME, PASSWORD)) {
-            System.out.println("Conexión establecida con éxito");
+            //System.out.println("Conexión establecida con éxito");
             printHeader();
             fetchAndPrintEventsData(conn);
             
+        } catch (SQLException se) {
+            muestraErrorSQL(se);
         } catch (Exception e) {
-            System.out.println("Error al conectar el servidor");
+            e.printStackTrace(System.err);
         }
     }
     
@@ -47,11 +49,17 @@ public class UD03TareaEvaluativaEjercicio1 {
     private static void fetchAndPrintEventsData(Connection conn) {
         String eventsQuery = "SELECT * FROM eventos ORDER BY nombre_evento DESC";
         
-        try(PreparedStatement stmt = conn.prepareStatement(eventsQuery)) {
-            ResultSet rs = stmt.executeQuery(eventsQuery);
+        try (
+                PreparedStatement stmt = conn.prepareStatement(eventsQuery);
+                ResultSet rs = stmt.executeQuery()
+        ) {
+            
+            // Control para informar si no hay datos
+            boolean hasData = false;
             
             // Recorre los resultados de la consulta
             while(rs.next()) {
+                hasData = true;
                 int idEvent = rs.getInt("id_evento");
                 String eventName = rs.getString("nombre_evento");
                 int idLocation = rs.getInt("id_ubicacion");
@@ -60,8 +68,15 @@ public class UD03TareaEvaluativaEjercicio1 {
                 printEventLine(conn, idEvent, eventName, idLocation);
             }
             
+            // Si no se encontraron datos
+            if(!hasData) {
+                System.out.println("No se encontraron eventos de la base de datos");
+            }
+            
+        } catch (SQLException se) {
+            muestraErrorSQL(se);
         } catch (Exception e) {
-            System.out.println("Error al obtener los eventos: " + e.getMessage());
+            e.printStackTrace(System.err);
         }
     }
     
@@ -79,6 +94,7 @@ public class UD03TareaEvaluativaEjercicio1 {
         // Obtiene los detalles de la ubicación
         String[] location = getEventLocation(conn, idLocation);
         
+        // Imprime una línea con los datos del evento
         System.out.printf("%-32s %-12s %-36s %-30s%n",
                 eventName, "| " + asistentes, "| " + location[0], "| " + location[1]);
         
@@ -98,12 +114,17 @@ public class UD03TareaEvaluativaEjercicio1 {
             stmt.setInt(1, idEvent);
             
             // Ejecuta la consulta
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if(rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    System.err.println("No se encontraron datos para el ID proporcionado: " + idEvent);
+                }
             }
+        } catch (SQLException se) {
+            muestraErrorSQL(se);
         } catch (Exception e) {
-            System.out.println("Error al obtener asistentes: " + e.getMessage());
+            e.printStackTrace(System.err);
         }
         return 0;
     }
@@ -116,26 +137,41 @@ public class UD03TareaEvaluativaEjercicio1 {
      */
     private static String[] getEventLocation(Connection conn, int idLocation) {
         String[] location = new String[2];
-        String asistentesQuery = "SELECT * FROM ubicaciones WHERE id_ubicacion = ?";
+        String locationQuery = "SELECT * FROM ubicaciones WHERE id_ubicacion = ?";
         
-        try (PreparedStatement stmt = conn.prepareStatement((asistentesQuery))) {
+        try (PreparedStatement stmt = conn.prepareStatement((locationQuery))) {
             // Establece el parámetro de la consulta
             stmt.setInt(1, idLocation);
             
             // Ejecuta la consulta
-            ResultSet rs = stmt.executeQuery();
-            
-            // Almacena el nombre y la dirección del evento
-            if (rs.next()) {
-                location[0] = rs.getString("nombre");
-                location[1] = rs.getString("direccion");
+            try (ResultSet rs = stmt.executeQuery()) {
+                // Almacena el nombre y la dirección del evento
+                if (rs.next()) {
+                    location[0] = rs.getString("nombre");
+                    location[1] = rs.getString("direccion");
+                } else {
+                    System.err.println("No se encontraron datos para el ID proporcionado: " + idLocation);
+                }
             }
+        } catch (SQLException se) {
+            muestraErrorSQL(se);
         } catch (Exception e) {
-            System.out.println("Error al obtener la ubicación: " + e.getMessage());
+            e.printStackTrace(System.err);
         }
         
         // Devuelve el array con el nombre y la dirección del evento
         return  location;
+    }
+    
+    /**
+     * Muestra los detalles de un error SQL en la consola
+     * Imprime información detallada del error para ayudar a depurar
+     * @param es Objeto SQLException con los detalles del error
+     */
+    public static void muestraErrorSQL(SQLException es) {
+        System.err.println("SQL ERROR mensaje: " + es.getMessage());
+        System.err.println("SQL Estado: " + es.getSQLState());
+        System.err.println("SQL código específico: " + es.getErrorCode());
     }
 }
 
