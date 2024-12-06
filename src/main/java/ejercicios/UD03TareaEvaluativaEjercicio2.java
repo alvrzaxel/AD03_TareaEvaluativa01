@@ -1,7 +1,7 @@
 /**************************************
  * Autor: Axel Álvarez Santos
  * Fecha: 26/11/2024
- * Tarea: AD03 Tarea Evaluativa 01
+ * Tarea: AD03 Tarea Evaluativa 01 Ejercicio 2
  **************************************/
 
 package ejercicios;
@@ -9,10 +9,8 @@ package ejercicios;
 import java.sql.*;
 
 /**
- * Clase que gestiona la conexión a la base de datos y
- * permite modificar la capacidad máxima de una ubicación.
- * La clase interactúa con el usuario para obtener la ubicación
- * y la nueva capacidad, y actualiza la base de datos.
+ * Gestiona la conexión a la base de datos y permite modificar la capacidad máxima de una ubicación
+ * Interactúa con el usuario para obtener la ubicación y la nueva capacidad, y actualiza la base de datos
  */
 public class UD03TareaEvaluativaEjercicio2 {
     
@@ -21,12 +19,7 @@ public class UD03TareaEvaluativaEjercicio2 {
     private static final String USERNAME = "root";
     private static final String PASSWORD = "secret";
     
-    
-    /**
-     * Entrada principal del programa que establece la conexión a la base de datos y
-     * ejecuta el flujo principal para modificar la capacidad de una ubicación
-     * @param args Argumentos de la línea de comandos (no utilizados)
-     */
+    // Punto de entrada principal
     public static void main(String[] args) {
         String location = "";
         
@@ -59,7 +52,7 @@ public class UD03TareaEvaluativaEjercicio2 {
         boolean locationFound = false;
         String inputLocation = "";
         
-        // Bucle para seguir pidiendo ubicación si no se encuentra
+        // Bucle para seguir pidiendo una ubicación si no se encuentra
         do {
             System.out.print("Introduce el nombre de la ubicación: ");
             inputLocation = Console.readString().trim();
@@ -86,9 +79,9 @@ public class UD03TareaEvaluativaEjercicio2 {
      */
     private static boolean checkLocationExists(Connection conn, String inputLocation) {
         // Consulta SQL para verificar la existencia de la ubicación dada
-        String checkLocationQuery = "SELECT 1 FROM ubicaciones WHERE nombre = ?";
+        String query = "SELECT 1 FROM ubicaciones WHERE nombre = ?";
         
-        try (PreparedStatement stmt = conn.prepareStatement(checkLocationQuery)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
             // Establece el parámetro de la consulta
             stmt.setString(1, inputLocation);
             
@@ -113,10 +106,10 @@ public class UD03TareaEvaluativaEjercicio2 {
      */
     private static void printTotalCapacity(Connection conn, String inputLocation) {
         // Consulta SQL para obtener la capacidad de la ubicación
-        String totalCapacityQuery = "SELECT capacidad FROM ubicaciones WHERE nombre = ?";
+        String query = "SELECT capacidad FROM ubicaciones WHERE nombre = ?";
         int totalCapacity = 0;
         
-        try (PreparedStatement stmt = conn.prepareStatement(totalCapacityQuery)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
             // Establece el parámetro de la consulta
             stmt.setString(1, inputLocation);
             
@@ -137,7 +130,6 @@ public class UD03TareaEvaluativaEjercicio2 {
         System.out.println("La capacidad actual de la ubicación '" + inputLocation + "' es: " + totalCapacity);
     }
     
-    
     /**
      * Gestiona la interacción con el usuario, verifica si la ubicación existe
      * en la base de datos y permite modificar su capacidad
@@ -157,11 +149,11 @@ public class UD03TareaEvaluativaEjercicio2 {
         // Muestra un mensaje con el resultado de la actualización
         if (rowsUpdated) {
             System.out.println("Capacidad actualizada correctamente.");
+            System.out.println();
         } else {
             System.out.println("No se encontraron coincidencias para actualizar");
         }
     }
-    
     
     /**
      * Actualiza la capacidad máxima de una ubicación de la base de datos
@@ -171,10 +163,10 @@ public class UD03TareaEvaluativaEjercicio2 {
      */
     private static boolean setTotalCapacity(Connection conn, String inputLocation, int inputTotalCapacity) {
         // Consulta SQL para actualizar la capacidad de una ubicación
-        String setTotalCapacityQuery = "UPDATE ubicaciones SET capacidad = ? WHERE nombre = ?";
+        String query = "UPDATE ubicaciones SET capacidad = ? WHERE nombre = ?";
         int rowsUpdated = 0;
         
-        try (PreparedStatement stmt = conn.prepareStatement(setTotalCapacityQuery)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
             // Establece los parámetros de la consulta
             stmt.setInt(1, inputTotalCapacity);
             stmt.setString(2, inputLocation);

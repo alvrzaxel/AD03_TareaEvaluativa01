@@ -1,13 +1,17 @@
 /**************************************
  * Autor: Axel Álvarez Santos
  * Fecha: 25/11/2024
- * Tarea: AD03 Tarea Evaluativa 01
+ * Tarea: AD03 Tarea Evaluativa 01 Ejercicio 1
  **************************************/
 
 package ejercicios;
 
 import java.sql.*;
 
+/**
+ * Conecta a una base de datos MySQL que contiene información sobre eventos y asistentes
+ * Imprime una lista de eventos, mostrando su nombre, el número de asistentes, la ubicación y su dirección
+ */
 public class UD03TareaEvaluativaEjercicio1 {
     
     // Configuración para la conexión a la base de datos
@@ -15,11 +19,16 @@ public class UD03TareaEvaluativaEjercicio1 {
     private static final String USERNAME = "root";
     private static final String PASSWORD = "secret";
     
+    // Punto de entrada principal
     public static void main(String[] args) {
+        
         // Establece la conexión con la base de datos y ejecuta el flujo principal
         try(Connection conn = DriverManager.getConnection(CONNECTION_URL, USERNAME, PASSWORD)) {
-            //System.out.println("Conexión establecida con éxito");
+            
+            // Imprime la cabecera de la tabla
             printHeader();
+            
+            // Busca e imprime la información de los eventos
             fetchAndPrintEventsData(conn);
             
         } catch (SQLException se) {
@@ -33,7 +42,7 @@ public class UD03TareaEvaluativaEjercicio1 {
      * Imprime la cabecera de la tabla con una separación
      */
     private static void printHeader() {
-        // Definimos el ancho total de la tabla
+        // Ancho total de la tabla
         int totalWidth = 120;
         String separator = "-".repeat(totalWidth);
         
@@ -47,10 +56,10 @@ public class UD03TareaEvaluativaEjercicio1 {
      * @param conn Conexión a la base de datos
      */
     private static void fetchAndPrintEventsData(Connection conn) {
-        String eventsQuery = "SELECT * FROM eventos ORDER BY nombre_evento DESC";
+        String query = "SELECT * FROM eventos ORDER BY nombre_evento DESC";
         
         try (
-                PreparedStatement stmt = conn.prepareStatement(eventsQuery);
+                PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()
         ) {
             // Control para informar si no hay datos
@@ -67,9 +76,9 @@ public class UD03TareaEvaluativaEjercicio1 {
                 printEventLine(conn, idEvent, eventName, idLocation);
             }
             
-            // Si no se encontraron datos
+            // Si no se encuentran datos
             if(!hasData) {
-                System.out.println("No se encontraron eventos de la base de datos");
+                System.out.println("No se encontraron eventos en la base de datos");
             }
             
         } catch (SQLException se) {
@@ -105,10 +114,10 @@ public class UD03TareaEvaluativaEjercicio1 {
      * @return Número de asistentes al evento
      */
     private static int getEventAttendees(Connection conn, int idEvent) {
-        String asistentesQuery = "SELECT COUNT(*) FROM asistentes_eventos WHERE id_evento = ?";
+        String query = "SELECT COUNT(*) FROM asistentes_eventos WHERE id_evento = ?";
         
-        try (PreparedStatement stmt = conn.prepareStatement(asistentesQuery)) {
-            // Establece el parámetro id_evento
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Establece el parámetro de la consulta
             stmt.setInt(1, idEvent);
             
             // Ejecuta la consulta
@@ -128,16 +137,16 @@ public class UD03TareaEvaluativaEjercicio1 {
     }
     
     /**
-     * Obtiene los detalles de la ubicación de un evento
+     * Obtiene el nombre y la dirección de la ubicación de un evento
      * @param conn Conexión a la base de datos
      * @param idLocation ID de la ubicación
      * @return Array de String con el nombre y la dirección de la ubicación
      */
     private static String[] getEventLocation(Connection conn, int idLocation) {
         String[] location = new String[2];
-        String locationQuery = "SELECT * FROM ubicaciones WHERE id_ubicacion = ?";
+        String query = "SELECT * FROM ubicaciones WHERE id_ubicacion = ?";
         
-        try (PreparedStatement stmt = conn.prepareStatement((locationQuery))) {
+        try (PreparedStatement stmt = conn.prepareStatement((query))) {
             // Establece el parámetro de la consulta
             stmt.setInt(1, idLocation);
             
@@ -157,7 +166,7 @@ public class UD03TareaEvaluativaEjercicio1 {
             e.printStackTrace(System.err);
         }
         
-        // Devuelve el array con el nombre y la dirección del evento
+        // Devuelve el array con el nombre y la dirección de la ubicación del evento
         return  location;
     }
     

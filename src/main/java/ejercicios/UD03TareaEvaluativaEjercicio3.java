@@ -1,14 +1,18 @@
 /**************************************
  * Autor: Axel Álvarez Santos
  * Fecha: 27/11/2024
- * Tarea: AD03 Tarea Evaluativa 01
+ * Tarea: AD03 Tarea Evaluativa 01 Ejercicio 3
  **************************************/
 
 package ejercicios;
 
 import java.sql.*;
 
-// Programa para gestionar asistentes y eventos en una base de datos
+/**
+ * Gestiona el proceso de registro de un asistente en un evento
+ * Permite al usuario ingresar su DNI, valida si ya está registrado en la base de datos y, si no lo está,
+ * registra su información. Luego muestra una lista de eventos disponibles y permite al usuario registrarse
+ */
 public class UD03TareaEvaluativaEjercicio3 {
     
     // Configuración para la conexión a la base de datos
@@ -28,7 +32,7 @@ public class UD03TareaEvaluativaEjercicio3 {
             // Muestra la lista de eventos
             printEventList(conn);
             
-            // Solicita y VALIDA el evento seleccionado por el usuario
+            // Solicita y valida el evento seleccionado por el usuario
             int selectedEventId = selectAndValidateEvent(conn);
             
             // Registra al asistente en el evento seleccionado
@@ -51,6 +55,7 @@ public class UD03TareaEvaluativaEjercicio3 {
         String attendeeDni;
         boolean isDniValid = false;
         
+        // Bucle para solicitar el DNI hasta que sea válido
         do {
             System.out.println("Introduce el DNI del asistente:");
             attendeeDni = Console.readString().toUpperCase();
@@ -124,10 +129,10 @@ public class UD03TareaEvaluativaEjercicio3 {
         String query = "INSERT INTO asistentes (dni, nombre) VALUES (?, ?)";
         
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Establece los parámetros de la consulta y la ejecuta
             stmt.setString(1, dni);
             stmt.setString(2, name);
             stmt.executeUpdate();
-            //System.out.println("El asistente " + name + " ha sido insertado.");
             
         } catch (SQLException es) {
             showSQLError(es);
@@ -175,8 +180,8 @@ public class UD03TareaEvaluativaEjercicio3 {
         int selectedEventId = -1;
         boolean isSelectionValid = false;
         
+        // Bucle que pide el número del evento mientras no tenga espacios disponibles
         do {
-            
             System.out.println("Elige el número del evento al que quiere asistir:");
             selectedEventId = Console.readInt();
             
@@ -207,6 +212,7 @@ public class UD03TareaEvaluativaEjercicio3 {
         String query = "SELECT id_ubicacion FROM eventos WHERE id_evento = ?";
         
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Establece el parámetro de la consulta
             stmt.setInt(1, idEvent);
             
             // Si obtiene resultados, retorna el id de la ubicación
@@ -239,6 +245,7 @@ public class UD03TareaEvaluativaEjercicio3 {
         int availableSpaces = 0;
         
         try (PreparedStatement stmt = conn.prepareStatement(getEventAttendees)) {
+            // Establece el parámetro de la consulta
             stmt.setInt(1, eventId);
             
             // Obtiene los sitios disponibles con la diferencia de la capacidad total y los asistentes registrados
@@ -269,6 +276,7 @@ public class UD03TareaEvaluativaEjercicio3 {
         String getEventCapacityQuery = "SELECT capacidad FROM ubicaciones WHERE id_ubicacion = ?";
         
         try (PreparedStatement stmt = conn.prepareStatement(getEventCapacityQuery)) {
+            // Establece el parámetro de la consulta
             stmt.setInt(1, idLocation);
             
             // Obtiene y devuelve la capacidad máxima
@@ -284,7 +292,7 @@ public class UD03TareaEvaluativaEjercicio3 {
             e.printStackTrace(System.err);
         }
         
-        return 0;
+        return 0; // Si no encuentra la ubicación del evento
     }
     
     /**
@@ -304,6 +312,7 @@ public class UD03TareaEvaluativaEjercicio3 {
         int rowsAffected = 0;
         String query = "INSERT INTO asistentes_eventos (dni, id_evento) VALUES (?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Establece los parámetros de la consulta y la ejecuta
             stmt.setString(1, attendeeDni);
             stmt.setInt(2, eventId);
             rowsAffected = stmt.executeUpdate();
@@ -330,6 +339,7 @@ public class UD03TareaEvaluativaEjercicio3 {
         String query = "SELECT 1 FROM asistentes_eventos WHERE dni = ? AND id_evento = ?";
         
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Establece los parámetros de la consulta
             stmt.setString(1, dni);
             stmt.setInt(2, idEvent);
             

@@ -15,16 +15,18 @@
     </properties>
 
     <dependencies>
+
+        <!--
+            MySQL Connector/J: Controlador JDBC para conectar con bases de datos MySQL
+            Permite que la aplicación Java pueda comunicarse y realizar operaciones con una
+            base de datos MySQL a través de la interfaz JDBC
+        -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>8.2.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>4.28.2</version>
-        </dependency>
+
     </dependencies>
 
 </project>
